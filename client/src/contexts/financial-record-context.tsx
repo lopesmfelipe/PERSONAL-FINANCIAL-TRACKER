@@ -13,8 +13,8 @@ interface FinancialRecord {
 interface FinancialRecordsContextType {
   records: FinancialRecord[];
   addRecord: (record: FinancialRecord) => void;
-  updateRecord: (id: string, newRecord: FinancialRecord) => void;
-  deleteRecord: (id: string) => void;
+  updateRecord?: (id: string, newRecord: FinancialRecord) => void;
+  deleteRecord?: (id: string) => void;
 }
 
 export const FinancialRecordsContext = createContext<
@@ -28,10 +28,13 @@ export const FinancialRecordsProvider = ({
 }) => {
   const [records, setRecords] = useState<FinancialRecord[]>([]);
 
-  const addRecords = async (record: FinancialRecord) => {
+  const addRecord = async (record: FinancialRecord) => {
     const response = await fetch("http://localhost:3001/financial-records", {
       method: "POST",
       body: JSON.stringify(record),
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
 
     try {
@@ -39,11 +42,14 @@ export const FinancialRecordsProvider = ({
         const newRecord = await response.json();
         setRecords((prev) => [...prev, newRecord]);
       }
-    } catch (err) {}
+    } catch (err) {
+      console.error("Error adding record", err);
+    }
   };
 
   return (
     <FinancialRecordsContext.Provider value={{ records, addRecord }}>
+      {""}
       {children}
     </FinancialRecordsContext.Provider>
   );
