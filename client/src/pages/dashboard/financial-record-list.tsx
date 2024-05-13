@@ -21,17 +21,20 @@ const EditableCell: React.FC<EditableCellProps> = ({
   const [value, setValue] = useState(initialValue);
 
   const onBlur = () => {
-    
-  }
+    setIsEditing(false)
+    updateRecord(row.index, column.id, value);
+  };
+
+
 
   return (
-    <div onClick={() => editable && setIsEditing(true)}>
+    <div onClick={() => editable && setIsEditing(true)} styles={{cursor: editable ? "pointer" : "default"}}>
       {isEditing ? (
         <input
           value={value}
           onChange={(e) => setValue(e.target.value)}
           autoFocus
-          onBlur={onblur}
+          onBlur={onBlur}
           style={{ width: "100%" }}
         />
       ) : typeof value === "string" ? (

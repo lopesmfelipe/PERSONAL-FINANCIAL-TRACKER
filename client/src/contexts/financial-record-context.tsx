@@ -66,6 +66,25 @@ export const FinancialRecordsProvider = ({
     }
   };
 
+  const updateRecord = async (id: string, newRecord: FinancialRecord) => {
+    const response = await fetch("http://localhost:3001/financial-records", {
+      method: "POST",
+      body: JSON.stringify(record),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    try {
+      if (response.ok) {
+        const newRecord = await response.json();
+        setRecords((prev) => [...prev, newRecord]);
+      }
+    } catch (err) {
+      console.error("Error adding record", err);
+    }
+  };
+
   return (
     <FinancialRecordsContext.Provider value={{ records, addRecord }}>
       {""}
