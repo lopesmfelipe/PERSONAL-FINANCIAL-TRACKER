@@ -14,8 +14,8 @@ export interface FinancialRecord {
 interface FinancialRecordsContextType {
   records: FinancialRecord[];
   addRecord: (record: FinancialRecord) => void;
-  updateRecord?: (id: string, newRecord: FinancialRecord) => void;
-  //  deleteRecord?: (id: string) => void;
+  updateRecord: (id: string, newRecord: FinancialRecord) => void;
+  deleteRecord: (id: string) => void;
 }
 
 export const FinancialRecordsContext = createContext<
@@ -66,7 +66,6 @@ export const FinancialRecordsProvider = ({
     }
   };
   const updateRecord = async (id: string, newRecord: FinancialRecord) => {
-    if (!user) return;
     const response = await fetch(
       `http://localhost:3001/financial-records/${id}`,
       {
@@ -95,47 +94,30 @@ export const FinancialRecordsProvider = ({
       console.error("Error adding record", err);
     }
   };
-  const deleteRecord = async (record: FinancialRecord) => {
-    const response = await fetch("http://localhost:3001/financial-records", {
-      method: "POST",
-      body: JSON.stringify(record),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+
+  const deleteRecord = async (id: string) => {
+    const response = await fetch(
+      `http://localhost:3001/financial-records/${id}`,
+      {
+        method: "DELETE",
+      }
+    );
 
     try {
       if (response.ok) {
-        const newRecord = await response.json();
-        setRecords((prev) => [...prev, newRecord]);
+        const deletedRecord = await response.json();
+        setRecords((prev) =>
+          prev.filter((record) => record._id !== deletedRecord._id)
+        );
       }
-    } catch (err) {
-      console.error("Error adding record", err);
-    }
-  };
-
-  const updateRecord = async (id: string, newRecord: FinancialRecord) => {
-    const response = await fetch("http://localhost:3001/financial-records", {
-      method: "POST",
-      body: JSON.stringify(record),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    try {
-      if (response.ok) {
-        const newRecord = await response.json();
-        setRecords((prev) => [...prev, newRecord]);
-      }
-    } catch (err) {
-      console.error("Error adding record", err);
+    } catch (error) {
+      console.error("Error adding record", error);
     }
   };
 
   return (
     <FinancialRecordsContext.Provider
-      value={{ records, addRecord, updateRecord }}
+      value={{ records, addRecord, updateRecord, deleteRecord }}
     >
       {children}
     </FinancialRecordsContext.Provider>
